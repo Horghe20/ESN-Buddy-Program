@@ -1,0 +1,295 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<style>
+    .details {
+        display: none;
+    }
+
+    .active-row {
+        background-color: #f0f0f0;
+    }
+
+    /* Optionally style clickable rows to indicate they are clickable */
+    .clickable-row-admins {
+        cursor: pointer;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Admins</h2>
+    <div class="row">
+        <div class="col-sm-12 table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Surname</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="admins-table">
+                    {% for admin in admins %}
+                    <!-- Added data attributes for easier update -->
+                    <tr class="clickable-row-admins" data-id="{{ admin.id }}" data-phone="{{ admin.phone_number }}"
+                        data-email="{{ admin.email }}" data-role="{{ admin.role }}">
+                        <td>{{ admin.id }}</td>
+                        <td>{{ admin.name }}</td>
+                        <td>{{ admin.surname }}</td>
+                        <td>{{ admin.phone_number }}</td>
+                        <td>{{ admin.email }}</td>
+                        <td>{{ 'Admin' if admin.role else 'Manager' }}</td>
+                        <td>
+                            <!-- The remove button stops propagation so that clicking it does not trigger the update modal -->
+                            <button class="btn btn-sm btn-danger remove-admin-button"
+                                data-id="{{ admin.id }}">Remove</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-12">
+            <button id="add-admin-button" class="btn btn-sm btn-success">Add Admin</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Admin Modal -->
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAdminModalLabel">Add Admin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="add-admin-form">
+                    <div class="mb-3">
+                        <label for="admin-name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="admin-name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="admin-surname" class="form-label">Surname</label>
+                        <input type="text" class="form-control" id="admin-surname" name="surname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="admin-phone-number" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="admin-phone-number" name="phone_number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="admin-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="admin-email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="admin-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="admin-password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="admin-role" class="form-label">Role</label>
+                        <select class="form-select" id="admin-role" name="role" required>
+                            <option value="1">Admin</option>
+                            <option value="0">Manager</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="confirm-add-admin-btn">Add Admin</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Admin Modal -->
+<div class="modal fade" id="updateAdminModal" tabindex="-1" aria-labelledby="updateAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateAdminModalLabel">Update Admin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-admin-form">
+                    <!-- Hidden field to store the admin ID -->
+                    <input type="hidden" name="admin_id" id="update-admin-id">
+                    <div class="mb-3">
+                        <label for="update-admin-phone-number" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="update-admin-phone-number" name="phone_number"
+                            required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update-admin-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="update-admin-email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update-admin-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="update-admin-password" name="password"
+                            placeholder="Leave blank to keep unchanged">
+                    </div>
+                    <div class="mb-3">
+                        <label for="update-admin-role" class="form-label">Role</label>
+                        <select class="form-select" id="update-admin-role" name="role" required>
+                            <option value="1">Admin</option>
+                            <option value="0">Manager</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="confirm-update-admin-btn">Update Admin</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Remove Admin Confirmation Modal -->
+<div class="modal fade" id="removeAdminModal" tabindex="-1" aria-labelledby="removeAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeAdminModalLabel">Confirm Removal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to remove this admin?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-remove-admin-button">Remove</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        let adminIdToRemove = null;
+
+        // --- Add Admin Modal ---
+        $('#add-admin-button').on('click', function () {
+            $('#addAdminModal').modal('show');
+        });
+
+        $('#add-admin-form').on('submit', function (event) {
+            event.preventDefault();
+            const confirm_add_admin_btn = $("#confirm-add-admin-btn");
+            confirm_add_admin_btn.prop('disabled', true);
+            confirm_add_admin_btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...');
+
+            const formData = {
+                name: $('#admin-name').val(),
+                surname: $('#admin-surname').val(),
+                phone_number: $('#admin-phone-number').val(),
+                email: $('#admin-email').val(),
+                password: $('#admin-password').val(),
+                role: $('#admin-role').val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/admin/add_admin',
+                data: JSON.stringify(formData),
+                contentType: 'application/json',
+                success: function (response) {
+                    $('#addAdminModal').modal('hide');
+                    showModal("Info", response.message);
+                    location.reload();
+                },
+                error: function (error) {
+                    $('#addAdminModal').modal('hide');
+                    confirm_add_admin_btn.prop('disabled', false);
+                    confirm_add_admin_btn.html('Add Admin');
+                    showModal("Error", error.responseJSON.error);
+                }
+            });
+        });
+
+        // --- Update Admin Modal ---
+        // When a row is clicked, open the update modal and pre-fill its fields.
+        $('.clickable-row-admins').on('click', function () {
+            let adminId = $(this).data('id');
+            let adminPhone = $(this).data('phone');
+            let adminEmail = $(this).data('email');
+            let adminRole = $(this).data('role');
+
+            // Populate the update modal fields.
+            $('#update-admin-id').val(adminId);
+            $('#update-admin-phone-number').val(adminPhone);
+            $('#update-admin-email').val(adminEmail);
+            $('#update-admin-role').val(adminRole);
+            // Leave password blank (if left blank, backend should ignore password change).
+
+            $('#updateAdminModal').modal('show');
+        });
+
+        $('#update-admin-form').on('submit', function (event) {
+            event.preventDefault();
+            const confirm_update_admin_btn = $("#confirm-update-admin-btn");
+            confirm_update_admin_btn.prop('disabled', true);
+            confirm_update_admin_btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...');
+
+            let adminId = $('#update-admin-id').val();
+            const updateData = {
+                phone_number: $('#update-admin-phone-number').val(),
+                email: $('#update-admin-email').val(),
+                password: $('#update-admin-password').val(),  // if empty, backend should ignore
+                role: $('#update-admin-role').val()
+            };
+
+            $.ajax({
+                type: 'PUT',
+                url: '/admin/update_admin/' + adminId,
+                data: JSON.stringify(updateData),
+                contentType: 'application/json',
+                success: function (response) {
+                    $('#updateAdminModal').modal('hide');
+                    showModal("Info", response.message);
+                    location.reload();
+                },
+                error: function (error) {
+                    $('#updateAdminModal').modal('hide');
+                    confirm_update_admin_btn.prop('disabled', false);
+                    confirm_update_admin_btn.html('Update Admin');
+                    showModal("Error", error.responseJSON.error);
+                }
+            });
+        });
+
+        // --- Remove Admin ---
+        $('.remove-admin-button').on('click', function (event) {
+            event.stopPropagation(); // Prevent triggering the row's update event.
+
+            adminIdToRemove = $(this).data('id');
+            $('#removeAdminModal').modal('show');
+        });
+
+        $('#confirm-remove-admin-button').on('click', function () {
+
+
+            if (adminIdToRemove) {
+                const confirm_remove_admin_btn = $("#confirm-remove-admin-button");
+                confirm_remove_admin_btn.prop('disabled', true);
+                confirm_remove_admin_btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Removing...');
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/remove_admin/' + adminIdToRemove,
+                    success: function (response) {
+                        $('#removeAdminModal').modal('hide');
+                        showModal("Info", response.message);
+                        location.reload();
+                    },
+                    error: function (error) {
+                        $('#removeAdminModal').modal('hide');
+                        confirm_remove_admin_btn.prop('disabled', false);
+                        confirm_remove_admin_btn.html('Remove');
+                        showModal("Error", error.responseJSON.error);
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+{% endblock %}

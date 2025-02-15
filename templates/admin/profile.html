@@ -1,0 +1,87 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Profile</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Profile Details</h5>
+            <p><strong>ID:</strong> {{ g.admin.id }}</p>
+            <p><strong>Name:</strong> {{ g.admin.name }}</p>
+            <p><strong>Surname:</strong> {{ g.admin.surname }}</p>
+            <p><strong>Phone Number:</strong> {{ g.admin.phone_number }}</p>
+            <p><strong>Email:</strong> {{ g.admin.email }}</p>
+            <p><strong>Role:</strong> {{ 'Admin' if g.admin.role else 'Manager' }}</p>
+            
+            <button class="btn btn-primary" id="update-password-btn">Change Password</button>
+        </div>
+    </div>
+</div>
+
+<!-- Update Password Modal -->
+<div class="modal fade" id="updatePasswordModal" tabindex="-1" aria-labelledby="updatePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-password-form">
+                    <div class="mb-3">
+                        <label for="current-password" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="current-password" name="current_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new-password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="new-password" name="new_password" required>
+                    </div>
+                    <button type="submit" class="btn btn-success" id="update_password_btn">Update Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#update-password-btn').on('click', function () {
+            $('#updatePasswordModal').modal('show');
+        });
+
+        $('#update-password-form').on('submit', function (event) {
+            event.preventDefault();
+            const update_password_btn = $("#update_password_btn");
+            update_password_btn.prop('disabled', true);
+            update_password_btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating Password...');
+
+            const formData = {
+                current_password: $('#current-password').val(),
+                new_password: $('#new-password').val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/admin/update_password',
+                data: JSON.stringify(formData),
+                contentType: 'application/json',
+                success: function (response) {
+                    $('#updatePasswordModal').modal('hide');
+                    showModal("Success", response.message);
+                },
+                error: function (error) {
+                    $('#updatePasswordModal').modal('hide');
+                    update_password_btn.prop('disabled', false);
+                    update_password_btn.html('Confirm');
+                    console.log(error)
+                    showModal("Error", error.responseJSON.error);
+
+                }
+            });
+        });
+    });
+
+</script>
+
+{% endblock %}
