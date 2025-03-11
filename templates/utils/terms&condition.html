@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center">Terms, Privacy & Conditions</h1>
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4>1. Terms of Use</h4>
+            <p>By using this web application, you agree to comply with the rules and guidelines set by ESN Palermo. Unauthorized use or abuse of the system is strictly prohibited.</p>
+            
+            <h4>2. Data Privacy</h4>
+            <p>We take your privacy seriously. All data collected is used exclusively by ESN Palermo for internal purposes, such as matching buddies and ESNers. <strong>Your data is never shared with third parties.</strong></p>
+            
+            <h4>3. Data Removal</h4>
+            <p>You have the right to request the removal of your data at any time. To do so, please contact us at <a href="mailto:support@esn.org">{{config.MAIL_USERNAME}}</a>, and we will process your request promptly.</p>
+
+            <h4>4. Security</h4>
+            <p>We implement strict security measures to protect your personal information from unauthorized access or misuse.</p>
+
+            <h4>5. Changes to These Terms</h4>
+            <p>ESN Palermo reserves the right to update these terms at any time. Changes will be posted on this page, and it is your responsibility to review them periodically.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

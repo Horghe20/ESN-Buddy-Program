@@ -1,0 +1,58 @@
+{% extends 'layout.html' %} {% block content %}
+<div class="container mt-1">
+  <h2 class="text-center mb-4">Profile</h2>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-sm-4">
+          <h4>Info</h4>
+          <p><strong>ID:</strong> {{ g.esner.id }}</p>
+          <p><strong>Name:</strong> {{ g.esner.name }}</p>
+          <p><strong>Surname:</strong> {{ g.esner.surname }}</p>
+          <p><strong>Phone Number:</strong> {{ g.esner.phone_number }}</p>
+          <p><strong>Email:</strong> {{ g.esner.email }}</p>
+          <p><strong>N° Buddy: </strong> {{ g.esner.buddies | length }}</p>
+          <p>
+            <strong>Roles: </strong> 
+            {% for esner_role in g.esner.roles %} 
+                {{ esner_role.role.name }},
+            {% endfor %}
+          </p>
+        </div>
+        <div class="col-sm-4">
+          <h4>Details</h4>
+          <p>
+            <strong>Languages Spoken:</strong> {% for languages in
+            g.esner.get_languages_spoken() %} {{ languages }}, {% endfor%}
+          </p>
+          <p>
+            <strong>Interests:</strong> {% for interests in
+            g.esner.get_interests() %} {{ interests }}, {% endfor%}
+          </p>
+          <p><strong>Description:</strong> {{ g.esner.description }}</p>
+
+        </div>
+        <div class="col-sm-4">
+          <h4>Wants</h4>
+          <p>
+            <strong>Max Number of Buddies:</strong> {{
+            g.esner.max_number_of_buddy }}
+          </p>
+          <p><strong>Gender:</strong> {{ g.esner.gender }}</p>
+          <p>
+            <strong>Nationality:</strong> {% for nation in
+            g.esner.get_nationality() %} {{nation }}, {% endfor%}
+          </p>
+          <p>
+            <strong>Faculty:</strong>{% for faculty in g.esner.get_faculty() %}
+            {{ faculty }}, {% endfor%}
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
