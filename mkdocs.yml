@@ -1,0 +1,8 @@
+site_name: "Esn-buddy-program"
+repo_url: "https://github.com/Horghe20/ESN-Buddy-Program"
+site_dir: "site"
+docs_dir: "docs"
+
+theme:
+  name: readthedocs
+  include_sidebar: true

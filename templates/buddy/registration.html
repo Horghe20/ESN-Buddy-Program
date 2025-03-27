@@ -1,0 +1,130 @@
+<link href="{{ url_for('static', filename='css/style_registration.css') }}" rel="stylesheet">
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Buddy Program! Looking for a buddy?</h2>
+    <h6 class="text-center mb-4">The Buddy program allows everyone to have an ally, friend, and support in your Erasmus city! Not sure where to start? Start with ESN! ESN Palermo will be happy to accompany you on your Erasmus journey.</h6>
+    
+    <form id="buddy-form">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required placeholder="Enter your name">
+        </div>
+
+        <div class="mb-3">
+            <label for="surname" class="form-label">Surname</label>
+            <input type="text" class="form-control" id="surname" name="surname" required placeholder="Enter your surname">
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required placeholder="Enter your email">
+        </div>
+
+        <div class="mb-3">
+            <label for="nationality" class="form-label">Nationality</label>
+            <select class="form-select" id="nationality" name="nationality" required>
+                <option value="" disabled selected>Select your nationality</option>
+                {% for nationality in data.nationalities %}
+                    <option value="{{ nationality }}">{{ nationality }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="languages" class="form-label">Languages Spoken <small>(Choose up to 5)</small></label>
+            <div id="languages-container" class="form-control item-container">
+                {% for language in data.languages %}
+                    <div class="item" onclick="selectLanguage('{{ language }}')">{{ language }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="selected-languages" class="form-label">Selected Languages</label>
+            <div id="selected-languages" class="form-control"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="faculty" class="form-label">Faculty</label>
+            <select class="form-select" id="faculty" name="faculty">
+                <option value="" disabled selected>Select your faculty</option>
+                {% for faculty in data.faculties %}
+                    <option value="{{ faculty }}">{{ faculty }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number <small>(Include country prefix, e.g., +39 for Italy)</small></label>
+            <input type="text" class="form-control" id="phone" name="phone" required 
+                placeholder="Enter your phone number with prefix" 
+                pattern="^\+\d{1,3}\d{4,14}$" 
+                oninvalid="setCustomValidity('Please enter a valid phone number with country prefix (e.g., +39XXXXXXXXXX).')"
+                oninput="setCustomValidity('')">
+            <div class="invalid-feedback">Please enter a valid phone number with the correct prefix.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="instagram" class="form-label">Instagram <small>(Enter your username, not a link)</small></label>
+            <input type="text" class="form-control" id="instagram" name="instagram" placeholder="Enter your Instagram username">
+        </div>
+
+        <div class="mb-3">
+            <label for="telegram" class="form-label">Telegram <small>(Enter your username, not a link)</small></label>
+            <input type="text" class="form-control" id="telegram" name="telegram" placeholder="Enter your Telegram username">
+        </div>
+
+        <div class="mb-3">
+            <label for="interests" class="form-label">Interests <small>(Choose between 5 and 15)</small></label>
+            <div id="interests-container" class="form-control item-container">
+                {% for interest in data.interests %}
+                    <div class="item" onclick="selectInterest('{{ interest }}')">{{ interest }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="selected-interests" class="form-label">Selected Interests</label>
+            <div id="selected-interests" class="form-control"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="gender" class="form-label">Gender</label>
+            <select class="form-select" id="gender" name="gender" required>
+                <option value="" disabled selected>Select your gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="semester" class="form-label">Arrival Semester</label>
+            <select class="form-select" id="semester" name="semester" required>
+                <option value="" disabled selected>Select your semester</option>
+                <option value="Winter">Winter (September - January)</option>
+                <option value="Summer">Summer (February - June)</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="year" class="form-label">Year <small>(Your arrival year)</small></label>
+            <input type="number" class="form-control" id="year" name="year" min="2025" placeholder="Enter your arrival year" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Tell us about yourself"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100" id="submit-btn">Submit</button>
+        <small class="d-block mt-2 text-muted">
+            By submitting, you automatically accept the <a href="{{url_for('term_and_Condition')}}" target="_blank" rel="noopener noreferrer">Terms & Conditions</a>.
+        </small>
+    </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/buddy/registration.js') }}"></script>
+{% endblock %}

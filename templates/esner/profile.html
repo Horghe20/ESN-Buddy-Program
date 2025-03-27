@@ -1,0 +1,148 @@
+{% extends 'layout.html' %} {% block content %}
+
+<div class="row m-0">
+  <div class="col-sm-12">
+    <div class="container mt-2">
+      <div class="card">
+        <h2 class="card-title text-center rounded bg-primary pt-1 pb-1">Profile</h2>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-4">
+              <h4>Info</h4>
+              <p><strong>ID:</strong> {{ g.esner.id }}</p>
+              <p><strong>Name:</strong> {{ g.esner.name }}</p>
+              <p><strong>Surname:</strong> {{ g.esner.surname }}</p>
+              <p><strong>Type:</strong> {{ g.esner.type }}</p>
+              <p><strong>Phone Number:</strong> {{ g.esner.phone_number }}</p>
+              <p><strong>Email:</strong> {{ g.esner.email }}</p>
+              <p><strong>N° Buddy: </strong> {{ g.esner.buddies | length }}</p>
+              <p>
+                <strong>Roles: </strong>
+                {% for esner_role in g.esner.roles %}
+                {{ esner_role.role.name }},
+                {% endfor %}
+              </p>
+            </div>
+            <div class="col-sm-4">
+              <h4>Details</h4>
+              <p>
+                <strong>Languages Spoken:</strong> {% for languages in
+                g.esner.get_languages_spoken() %} {{ languages }}, {% endfor%}
+              </p>
+              <p>
+                <strong>Interests:</strong> {% for interests in
+                g.esner.get_interests() %} {{ interests }}, {% endfor%}
+              </p>
+              <p><strong>Description:</strong> {{ g.esner.description }}</p>
+
+            </div>
+            <div class="col-sm-4">
+              <h4>Wants</h4>
+              <p>
+                <strong>Max Number of Buddies:</strong> {{
+                g.esner.max_number_of_buddy }}
+              </p>
+              <p><strong>Gender:</strong> {{ g.esner.gender }}</p>
+              <p>
+                <strong>Nationality:</strong> {% for nation in
+                g.esner.get_nationality() %} {{nation }}, {% endfor%}
+              </p>
+              <p>
+                <strong>Faculty:</strong>{% for faculty in g.esner.get_faculty() %}
+                {{ faculty }}, {% endfor%}
+              </p>
+
+            </div>
+          </div>
+          <a href="{{ url_for('esner.update_profile') }}" class="btn btn-outline-warning">Update Profile</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12">
+    <div class="container mt-2">
+      <div class="card">
+        <h2 class="card-title text-center rounded bg-primary pt-1 pb-1">Buddy</h2>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="scrollable-table-container">
+                {% if g.esner.buddies | length > 0 %}
+                <table class="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Gender</th>
+                      <th>Nationality</th>
+                    </tr>
+                  </thead>
+                  <tbody id="buddies-table">
+                    {% for buddy in g.esner.buddies: %}
+                    <tr class="clickable-row-buddies" data-id="{{ buddy.id }}">
+                      <td>
+                        {{buddy.id}}
+                      </td>
+                      <td>{{buddy.name}}</td>
+                      <td>{{buddy.gender}}</td>
+                      <td>{% for n in buddy.get_nationality() %} {{n}} {% endfor %}</td>
+                    </tr>
+                    <tr class="details" id="details-buddies-{{buddy.id}}">
+                      <td colspan="4">
+                        <strong>Surname:</strong> {{buddy.surname}}<br />
+                        <strong>Languages:</strong>
+                        <span class="buddy-languages">
+                          {% for n in buddy.get_languages_spoken() %} {{ n }}{% if not
+                          loop.last %}, {% endif %} {% endfor %} </span><br />
+                        <strong>Faculty:</strong>
+                        <span class="buddy-faculty">
+                          {% for n in buddy.get_faculty() %} {{ n }}{% if not loop.last
+                          %}, {% endif %} {% endfor %} </span><br />
+                        <strong>Interests:</strong>
+                        <span class="buddy-interests">
+                          {% for n in buddy.get_interests() %} {{ n }}{% if not
+                          loop.last %}, {% endif %} {% endfor %} </span><br />
+                        <strong>Description:</strong> {{buddy.description}}<br />
+                        <strong>Semester:</strong> {{buddy.semester}}<br />
+                        <strong>Year:</strong> {{buddy.year}}<br />
+                        <strong>Phone:</strong> {{ buddy.phone_number }}<br />
+                        <strong>Email:</strong> {{buddy.email}}<br />
+                        <strong>Instagram:</strong> {{ buddy.instagram }}<br />
+                        <strong>Telegram:</strong> {{ buddy.telegram }}<br />
+                        <strong>Esner:</strong> {{buddy.esn_member_id}} <br />
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                {% else %}
+                <p class="text-center">No Buddy Yet 😭</p>
+                {% endif%}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(".clickable-row-buddies").on("click", function () {
+    const id = $(this).data("id");
+    const detailsRow = $(`#details-buddies-${id}`);
+
+    // Close any open details rows in the buddies table
+    $("#buddies-table .details").not(detailsRow).hide();
+    $("#buddies-table .clickable-row-buddies")
+      .not(this)
+      .removeClass("active-row");
+
+    // Toggle the clicked row
+    detailsRow.toggle();
+    $(this).toggleClass("active-row");
+    checkAndHighlight();
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,141 @@
+<link href="{{ url_for('static', filename='css/style_registration.css') }}" rel="stylesheet">
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">ESN Buddy Program Application Form</h2>
+    <h6 class="text-center mb-4">Compile the following to get a Buddy!</h6>
+    <form id="buddy-form" method="POST" onsubmit="return validateForm()">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required placeholder="Enter your name">
+        </div>
+        <div class="mb-3">
+            <label for="surname" class="form-label">Surname</label>
+            <input type="text" class="form-control" id="surname" name="surname" required placeholder="Enter your surname">
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required  placeholder="e.g., yourname@esnpalermo.com">
+        </div>
+        <div class="mb-3">
+            <label for="type" class="form-label">ESN Member Type</label> <small>(Select your role in the ESN organization)</small>
+            <select class="form-select" id="type" name="type" required>
+                <option value="" disabled selected>Select your ESN member type</option>
+                <option value="Volunteer">Volunteer</option>
+                <option value="Alumnus">Alumnus</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="nationality" class="form-label">Nationality <small>(Select the nationality of the Erasmus you are interested in or "Not Interested")</small></label>
+            <div id="nationality-container" class="form-control item-container">
+                {% for nationality in data.nationalities %}
+                    <div class="item" onclick="selectNationality('{{ nationality }}')">{{ nationality }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="selected-nationality" class="form-label">Selected Nationalities </label>
+            <div id="selected-nationality" class="form-control"></div>
+        </div>
+        <div class="mb-3">
+            <label for="languages" class="form-label">Languages Spoken <small>(Languages you can speak or want to practice - Choose up to 5)</small></label>
+            <div id="languages-container" class="form-control item-container">
+                {% for language in data.languages %}
+                    <div class="item" onclick="selectLanguage('{{ language }}')">{{ language }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="selected-languages" class="form-label">Selected Languages</label>
+            <div id="selected-languages" class="form-control"></div>
+        </div>
+        <div class="mb-3">
+            <label for="faculty" class="form-label">Faculty  <small>(If you want a buddy from your Faculty, add your Faculty. Otherwise, select the Faculty you want a buddy from. - Choose up to 3)</small></label>
+            <div id="faculty-container" class="form-control item-container">
+                {% for faculty in data.faculties %}
+                    <div class="item" onclick="selectFaculty('{{ faculty }}')">{{ faculty }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="selected-faculty" class="form-label">Selected Faculties</label>
+            <div id="selected-faculty" class="form-control"></div>
+        </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number <small>(Include country prefix, e.g., +39 for Italy)</small></label>
+            <input type="text" class="form-control" id="phone" name="phone" required placeholder="e.g., +39XXXXXXXXXX" pattern="^\+\d{1,3}\d{4,14}$">
+        </div>
+        <!-- <div class="mb-3">
+            <label for="instagram" class="form-label">Instagram <small>(Enter your username, not a link)</small></label>
+            <input type="text" class="form-control" id="instagram" name="instagram" placeholder="e.g., yourusername">
+        </div> -->
+
+        <!-- <div class="mb-3">
+            <label for="telegram" class="form-label">Telegram <small>(Enter your username, not a link)</small></label>
+            <input type="text" class="form-control" id="telegram" name="telegram" placeholder="e.g., yourusername">
+        </div> -->
+        <div class="mb-3">
+            <label for="interests" class="form-label">Interests  <small>(Choose between 5 and 10)</small></label>
+            <div id="interests-container" class="form-control item-container">
+                {% for interest in data.interests %}
+                    <div class="item" onclick="selectInterest('{{ interest }}')">{{ interest }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="selected-interests" class="form-label">Selected Interests</label>
+            <div id="selected-interests" class="form-control"></div>
+        </div>
+        <div class="mb-3">
+            <label for="gender" class="form-label">Gender  <small>(That your Buddy should have)</small></label>
+            <select class="form-select" id="gender" name="gender" required>
+                <option value="" disabled selected>Select a gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+                <option value="Not Interested">Not Interested</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="max_number_of_buddy">Maximum Number of Buddies</label>
+            <input type="number" id="max_number_of_buddy" name="max_number_of_buddy" class="form-control" min="1" max="5" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Tell us about yourself"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label> <small>(Password must be 8-30 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.)</small>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required minlength="8" maxlength="30" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,30}" title="Password must be 8-30 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.">
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100" id="submit-btn">Submit</button>
+        <small class="d-block mt-2 text-muted">
+            By submitting, you automatically accept the <a href="{{url_for('term_and_Condition')}}" target="_blank" rel="noopener noreferrer">Terms & Conditions</a>.
+        </small>
+    </form>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="validationModalLabel">Validation Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="validationModalBody">
+                <!-- Validation message will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/esner/registration.js') }}"></script>
+{% endblock %}

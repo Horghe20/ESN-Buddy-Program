@@ -1,0 +1,91 @@
+{% extends 'layout.html' %} {% block content %}
+<style>
+  .details {
+    display: none;
+  }
+
+  .active-row {
+    background-color: #f0f0f0;
+  }
+
+  /* Optionally style clickable rows to indicate they are clickable */
+  .clickable-row-esners {
+    cursor: pointer;
+  }
+  /* Table Container to enable scrolling */
+  .table-container {
+    max-height: 70vh; /* Adjusted height to fit within screen */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+  }
+  /* Fix table header */
+  thead th {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 2;
+  }
+</style>
+
+<div class="container mt-1">
+  <h2 class="text-center mb-4">Esners</h2>
+  <div class="input-group">
+    <input
+      type="text"
+      id="search"
+      class="form-control"
+      placeholder="Search..."
+    />
+  </div>
+  <div class="table-container">
+    <table class="table table-sm table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Surname</th>
+          <th>Phone Number</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody id="esners-table">
+        {% for esner in esners %}
+        <!-- Added data attributes for easier update -->
+        <tr
+          class="clickable-row-esners"
+          data-href="{{ url_for('admin.esner_info', esner_id=esner.id) }}"
+          data-id="{{ esner.id }}"
+        >
+          <td>{{ esner.id }}</td>
+          <td>{{ esner.name }}</td>
+          <td>{{ esner.surname }}</td>
+          <td>{{ esner.phone_number }}</td>
+          <td>{{ esner.email }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $(".clickable-row-esners").click(function () {
+      window.location.href = $(this).data("href");
+    });
+
+    // Search functionality for esners table
+    $("#search").on("keyup", function () {
+      const searchValue = $(this).val().toLowerCase();
+      $("#esners-table tr.clickable-row-esners").filter(function () {
+        // Get all the text content from this row's cells
+        const rowText = $(this).text().toLowerCase();
+        // Check if the row text contains the search value
+        const visible = rowText.indexOf(searchValue) > -1;
+        $(this).toggle(visible);
+      });
+    });
+  });
+</script>
+
+{% endblock %}

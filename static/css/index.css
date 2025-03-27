@@ -1,0 +1,18 @@
+body {
+    background-color: #f8f9fa;
+}
+
+/* Scrollable container style */
+.scrollable-table-container {
+    max-height: 65vh;
+    /* Set your desired fixed height */
+    overflow-y: auto;
+}
+
+.details {
+    display: none;
+}
+
+.active-row {
+    background-color: #f0f0f0;
+}

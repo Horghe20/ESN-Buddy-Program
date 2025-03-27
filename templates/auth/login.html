@@ -1,0 +1,63 @@
+<!-- <link href="{{ url_for('static', filename='css/style_registration.css') }}" rel="stylesheet"> -->
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container bg-white mt-5 mb-5 col-sm-4 rounded-3">
+    <h2 class="text-center pt-3 mb-4">Login</h2>
+    <form id="login-form" class="pb-4">
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required placeholder="Enter your email" value="test@esnpalermo.com">
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required placeholder="Enter your password" value="test">
+        </div>
+        <button type="submit" class="btn btn-primary w-100" id="login-btn">Login</button>
+        <small><a href="{{url_for('auth.forgot_password')}}">Forgot password?</a></small>
+    </form>
+</div>
+
+<script>
+
+
+function validateLoginForm() {
+    const form = document.getElementById('login-form');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return false;
+    }
+    return true;
+}
+
+document.getElementById('login-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const login_btn = $("#login-btn");
+    if (validateLoginForm()) {
+        const formData = {
+            email: $('#email').val(),
+            password: $('#password').val()
+        };
+        login_btn.prop('disabled', true);
+        login_btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Logging...');
+
+        $.ajax({
+            type: 'POST',
+            url: '/auth/login',
+            data: JSON.stringify(formData),
+            contentType: 'application/json',
+            success: function(response) {
+                showModal('Success','Login successful!');
+                window.location.href = response.redirect;            
+            },
+            error: function(error) {
+                login_btn.prop('disabled', false);
+                login_btn.html('Login');
+                showModal('Error',error.responseJSON.error);
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}
