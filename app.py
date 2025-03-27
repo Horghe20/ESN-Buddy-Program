@@ -92,8 +92,8 @@ def create_app(test_config=None):
         add_test_esner_and_admin_role()
 
     # Initialize email service
-    # from utils.email_service import email_service
-    # email_service.mail.init_app(app)
+    from utils.email_service import email_service
+    email_service.mail.init_app(app)
 
     # Register application blueprints
     import controller.auth, controller.buddy_program, controller.esner, controller.buddy, controller.admin
@@ -109,4 +109,4 @@ def create_app(test_config=None):
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)  
+    app.run(host='0.0.0.0', port=5000, debug=True)  

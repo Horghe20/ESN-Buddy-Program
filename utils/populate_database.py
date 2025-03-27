@@ -172,12 +172,12 @@ def main():
         fake = Faker()
         
         # Insert 50 Buddy entries
-        for _ in range(50):
+        for _ in range(12):
             buddy = generate_buddy(fake, options)
             db.session.add(buddy)
         
         # Insert 10 Esners entries
-        for _ in range(50):
+        for _ in range(5):
             esner = generate_esner(fake, options)
             db.session.add(esner)
         
