@@ -88,6 +88,16 @@ def page_not_found(e):
 init_db(app)
 migrate = Migrate(app, db)
 
+# Auto-run migrations in production environment
+if os.environ.get('FLASK_ENV') == 'production':
+    with app.app_context():
+        try:
+            from flask_migrate import upgrade as _upgrade
+            _upgrade()
+            print("Database migrations applied successfully")
+        except Exception as e:
+            print(f"Error applying migrations: {str(e)}")
+
 
 # Initialize email service
 from utils.email_service import email_service
