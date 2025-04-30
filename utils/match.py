@@ -22,7 +22,7 @@ Usage:
 """
 
 from database.tables import Buddy, Esner
-from utils.config import TOP_AUTOMATIC_MATCH
+from utils.config import BaseConfig
 
 def compute_match_score(buddy: Buddy, esner: Esner, weights=None):
     """
@@ -229,7 +229,7 @@ def match_making(buddies, esners):
         fs_candidates.sort(key=lambda x: (x[2], -x[1]))
         
         # Select the top 3 candidates.
-        top_matches = fs_candidates[:TOP_AUTOMATIC_MATCH]
+        top_matches = fs_candidates[:BaseConfig.TOP_AUTOMATIC_MATCH]
         
         # Record the selected matches.
         for fs_id, score, buddy_count, index in top_matches:

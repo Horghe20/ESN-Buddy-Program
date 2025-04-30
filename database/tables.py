@@ -127,6 +127,7 @@ class Esner(db.Model):
     max_number_of_buddy = db.Column(db.Integer, nullable=False, default=3)
     description = db.Column(db.Text)
     password_hash = db.Column(db.String(255), nullable=False)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
     buddies = db.relationship('Buddy', backref='esn_member', lazy=True)
     roles = db.relationship('EsnerRole', back_populates='esner', cascade="all, delete-orphan")
 
