@@ -1,46 +1,97 @@
+
 {% extends 'layout.html' %} {% block content %}
 <style>
   .clickable-row {
     cursor: pointer;
+    transition: background-color 0.2s;
   }
+  
+  .clickable-row:hover {
+    background-color: #f8f9fa;
+  }
+  
   .details {
     display: none;
-    background-color: #f9f9f9;
+    background-color: #f8f9fa;
   }
-  /* Table Container to enable scrolling */
+  
+  .details td {
+    padding: 1.5rem !important;
+  }
+  
+  /* Table Container */
   .table-container {
-    max-height: 70vh; /* Adjusted height to fit within screen */
+    max-height: 70vh;
     overflow-y: auto;
-    border: 1px solid #ddd;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.375rem;
   }
+  
   /* Fix table header */
   thead th {
     position: sticky;
     top: 0;
-    background-color: white;
+    background-color: #f8f9fa;
     z-index: 2;
+    border: none;
+    font-weight: 500;
+    color: #6c757d;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  thead th:hover {
+    background-color: #e9ecef;
+  }
+  
+  thead th.sorted-asc::after {
+    content: " ↑";
+    color: #0d6efd;
+  }
+  
+  thead th.sorted-desc::after {
+    content: " ↓";
+    color: #0d6efd;
+  }
+  
+  table {
+    border: none !important;
+  }
+  
+  table td, table th {
+    border: none !important;
+    border-bottom: 1px solid #f8f9fa !important;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .text-primary {
+    font-weight: 600;
   }
 </style>
 
-<div class="container mt-1">
-  <h2 class="text-center mb-4">Match Records</h2>
-  <div class="input-group">
+<div class="container mt-4">
+  <h2 class="text-center text-primary mb-4">Match Records</h2>
+  <div class="input-group mb-3">
     <input
       type="text"
       id="search"
-      class="form-control"
+      class="form-control border-0 shadow-sm"
       placeholder="Search..."
     />
   </div>
   <div class="table-container">
-    <table class="table table-bordered table-hover" id="match-table">
+    <table class="table table-hover" id="matchTable">
       <thead>
         <tr>
-          <th>Buddy ID</th>
-          <th>Buddy Name</th>
-          <th>ESNer ID</th>
-          <th>ESNer Name</th>
-          <th>Score</th>
+          <th onclick="sortTable(0)">Buddy ID</th>
+          <th onclick="sortTable(1)">Buddy Name</th>
+          <th onclick="sortTable(2)">ESNer ID</th>
+          <th onclick="sortTable(3)">ESNer Name</th>
+          <th onclick="sortTable(4)">Score</th>
         </tr>
       </thead>
       <tbody id="match-table">
@@ -55,146 +106,198 @@
           <td>{{ buddy.name }} {{ buddy.surname }}</td>
           <td>{{ esner.id }}</td>
           <td>{{ esner.name }} {{ esner.surname }}</td>
-          <td>{{ score }}%</td>
+          <td><span class="badge bg-primary">{{ score }}%</span></td>
         </tr>
         <!-- Details Row -->
         <tr class="details" id="details-{{ buddy.id }}-{{ esner.id }}">
           <td colspan="5">
-            {# Compute common attributes #} {# Interests #} {% set
-            buddy_interests = buddy.get_interests() %} {% set esner_interests =
-            esner.get_interests() %} {% set common_interests = [] %} {% for
-            interest in buddy_interests %} {% if interest in esner_interests %}
-            {% set _ = common_interests.append(interest) %} {% endif %} {%
-            endfor %} {# Nationalities #} {% set buddy_nationalities =
-            buddy.get_nationality() %} {% set esner_nationalities =
-            esner.get_nationality() %} {% set common_nationalities = [] %} {%
-            for nat in buddy_nationalities %} {% if nat in esner_nationalities
-            %} {% set _ = common_nationalities.append(nat) %} {% endif %} {%
-            endfor %} {# Languages #} {% set buddy_languages =
-            buddy.get_languages_spoken() %} {% set esner_languages =
-            esner.get_languages_spoken() %} {% set common_languages = [] %} {%
-            for lang in buddy_languages %} {% if lang in esner_languages %} {%
-            set _ = common_languages.append(lang) %} {% endif %} {% endfor %} {#
-            Faculties #} {% set buddy_faculties = buddy.get_faculty() %} {% set
-            esner_faculties = esner.get_faculty() %} {% set common_faculties =
-            [] %} {% for fac in buddy_faculties %} {% if fac in esner_faculties
-            %} {% set _ = common_faculties.append(fac) %} {% endif %} {% endfor
-            %}
+            {# Compute common attributes #} 
+            {# Interests #} 
+            {% set buddy_interests = buddy.get_interests() %} 
+            {% set esner_interests = esner.get_interests() %} 
+            {% set common_interests = [] %} 
+            {% for interest in buddy_interests %} 
+              {% if interest in esner_interests %}
+                {% set _ = common_interests.append(interest) %} 
+              {% endif %} 
+            {% endfor %} 
+            
+            {# Nationalities #} 
+            {% set buddy_nationalities = buddy.get_nationality() %} 
+            {% set esner_nationalities = esner.get_nationality() %} 
+            {% set common_nationalities = [] %} 
+            {% for nat in buddy_nationalities %} 
+              {% if nat in esner_nationalities %} 
+                {% set _ = common_nationalities.append(nat) %} 
+              {% endif %} 
+            {% endfor %} 
+            
+            {# Languages #} 
+            {% set buddy_languages = buddy.get_languages_spoken() %} 
+            {% set esner_languages = esner.get_languages_spoken() %} 
+            {% set common_languages = [] %} 
+            {% for lang in buddy_languages %} 
+              {% if lang in esner_languages %} 
+                {% set _ = common_languages.append(lang) %} 
+              {% endif %} 
+            {% endfor %} 
+            
+            {# Faculties #} 
+            {% set buddy_faculties = buddy.get_faculty() %} 
+            {% set esner_faculties = esner.get_faculty() %} 
+            {% set common_faculties = [] %} 
+            {% for fac in buddy_faculties %} 
+              {% if fac in esner_faculties %} 
+                {% set _ = common_faculties.append(fac) %} 
+              {% endif %} 
+            {% endfor %}
 
             <div class="row">
               <!-- Buddy Details -->
               <div class="col-md-6">
-                <h5>Buddy Details</h5>
-                <p><strong>ID:</strong> {{ buddy.id }}</p>
-                <p>
-                  <strong>Name:</strong> {{ buddy.name }} {{ buddy.surname }}
-                </p>
+                <h5 class="text-muted mb-3">Buddy Details</h5>
+                <p><strong>ID:</strong> <span class="text-muted">{{ buddy.id }}</span></p>
+                <p><strong>Name:</strong> <span class="text-muted">{{ buddy.name }} {{ buddy.surname }}</span></p>
                 <p>
                   <strong>Gender:</strong>
                   {% if buddy.gender == esner.gender %}
-                  <span class="text-primary">{{ buddy.gender }}</span>
-                  {% else %} {{ buddy.gender }} {% endif %}
+                    <span class="text-success fw-bold">{{ buddy.gender }}</span>
+                  {% else %} 
+                    <span class="text-muted">{{ buddy.gender }}</span> 
+                  {% endif %}
                 </p>
                 <p>
                   <strong>Nationality:</strong>
-                  {% for n in buddy_nationalities %} {% if n in
-                  common_nationalities %}
-                  <span class="text-primary">{{ n }}</span>{% if not loop.last
-                  %}, {% endif %} {% else %} {{ n }}{% if not loop.last %}, {%
-                  endif %} {% endif %} {% endfor %}
+                  {% for n in buddy_nationalities %} 
+                    {% if n in common_nationalities %}
+                      <span class="text-success fw-bold">{{ n }}</span>{% if not loop.last %}, {% endif %} 
+                    {% else %} 
+                      <span class="text-muted">{{ n }}</span>{% if not loop.last %}, {% endif %} 
+                    {% endif %} 
+                  {% endfor %}
                 </p>
                 <p>
                   <strong>Languages:</strong>
-                  {% for l in buddy_languages %} {% if l in common_languages %}
-                  <span class="text-primary">{{ l }}</span>{% if not loop.last
-                  %}, {% endif %} {% else %} {{ l }}{% if not loop.last %}, {%
-                  endif %} {% endif %} {% endfor %}
+                  {% for l in buddy_languages %} 
+                    {% if l in common_languages %}
+                      <span class="text-success fw-bold">{{ l }}</span>{% if not loop.last %}, {% endif %} 
+                    {% else %} 
+                      <span class="text-muted">{{ l }}</span>{% if not loop.last %}, {% endif %} 
+                    {% endif %} 
+                  {% endfor %}
                 </p>
                 <p>
                   <strong>Faculty:</strong>
-                  {% for f in buddy_faculties %} {% if f in common_faculties %}
-                  <span class="text-primary">{{ f }}</span>{% if not loop.last
-                  %}, {% endif %} {% else %} {{ f }}{% if not loop.last %}, {%
-                  endif %} {% endif %} {% endfor %}
+                  {% for f in buddy_faculties %} 
+                    {% if f in common_faculties %}
+                      <span class="text-success fw-bold">{{ f }}</span>{% if not loop.last %}, {% endif %} 
+                    {% else %} 
+                      <span class="text-muted">{{ f }}</span>{% if not loop.last %}, {% endif %} 
+                    {% endif %} 
+                  {% endfor %}
                 </p>
                 <p>
                   <strong>Interests:</strong>
-                  {% for i in buddy_interests %} {% if i in common_interests %}
-                  <span class="text-primary">{{ i }}</span>{% if not loop.last
-                  %}, {% endif %} {% else %} {{ i }}{% if not loop.last %}, {%
-                  endif %} {% endif %} {% endfor %}
+                  {% for i in buddy_interests %} 
+                    {% if i in common_interests %}
+                      <span class="text-success fw-bold">{{ i }}</span>{% if not loop.last %}, {% endif %} 
+                    {% else %} 
+                      <span class="text-muted">{{ i }}</span>{% if not loop.last %}, {% endif %} 
+                    {% endif %} 
+                  {% endfor %}
                 </p>
-                <p><strong>Description:</strong> {{buddy.description}}<br /></p>
-                <p><strong>Semester:</strong> {{buddy.semester}}</p>
-                <p><strong>Year:</strong> {{buddy.year}}</p>
-                <p><strong>Email:</strong> {{ buddy.email }}</p>
-                <p><strong>Phone:</strong> {{ buddy.phone_number }}</p>
-                <p><strong>Instagram:</strong> {{ buddy.instagram }}</p>
-                <p><strong>Telegram:</strong> {{ buddy.telegram }}</p>
+                <p><strong>Description:</strong> <span class="text-muted">{{ buddy.description }}</span></p>
+                <p><strong>Semester:</strong> <span class="text-muted">{{ buddy.semester }}</span></p>
+                <p><strong>Year:</strong> <span class="text-muted">{{ buddy.year }}</span></p>
+                <p><strong>Email:</strong> <span class="text-muted">{{ buddy.email }}</span></p>
+                <p><strong>Phone:</strong> <span class="text-muted">{{ buddy.phone_number }}</span></p>
+                <p><strong>Instagram:</strong> 
+                  {% if buddy.instagram %}
+                    <a href="https://www.instagram.com/{{ buddy.instagram }}" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="text-decoration-none text-primary">
+                       <i class="bi bi-instagram"></i> @{{ buddy.instagram }}
+                    </a>
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                </p>
+                <p><strong>Telegram:</strong> <span class="text-muted">{{ buddy.telegram or '-' }}</span></p>
               </div>
+              
               <!-- ESNer Details -->
               <div class="col-md-6">
-                <h5>ESNer Details</h5>
-                <p><strong>ID:</strong> {{ esner.id }}</p>
-                <p><strong>Name:</strong> {{ esner.name }} {{ esner.surname }}</p>
+                <h5 class="text-muted mb-3">ESNer Details</h5>
+                <p><strong>ID:</strong> <span class="text-muted">{{ esner.id }}</span></p>
+                <p><strong>Name:</strong> <span class="text-muted">{{ esner.name }} {{ esner.surname }}</span></p>
                 <p>
                   <strong>Wants Gender:</strong>
                   {% if esner.gender == buddy.gender %}
-                  <span class="text-primary">{{ esner.gender }}</span>
-                  {% else %} {{ esner.gender }} {% endif %}
+                    <span class="text-success fw-bold">{{ esner.gender }}</span>
+                  {% else %} 
+                    <span class="text-muted">{{ esner.gender }}</span> 
+                  {% endif %}
                 </p>
                 <p>
                   <strong>Wants Nationality:</strong>
-                  {% for n in esner_nationalities %} {% if n in
-                  common_nationalities %}
-                  <span class="text-primary">{{ n }}</span>{% if not loop.last
-                  %}, {% endif %} {% else %} {{ n }}{% if not loop.last %}, {%
-                  endif %} {% endif %} {% endfor %}
+                  {% for n in esner_nationalities %} 
+                    {% if n in common_nationalities %}
+                      <span class="text-success fw-bold">{{ n }}</span>{% if not loop.last %}, {% endif %} 
+                    {% else %} 
+                      <span class="text-muted">{{ n }}</span>{% if not loop.last %}, {% endif %} 
+                    {% endif %} 
+                  {% endfor %}
                 </p>
                 <p>
                   <strong>Languages:</strong>
-                  {% for l in esner_languages %} {% if l in common_languages %}
-                  <span class="text-primary">{{ l }}</span>{% if not loop.last
-                  %}, {% endif %} {% else %} {{ l }}{% if not loop.last %}, {%
-                  endif %} {% endif %} {% endfor %}
+                  {% for l in esner_languages %} 
+                    {% if l in common_languages %}
+                      <span class="text-success fw-bold">{{ l }}</span>{% if not loop.last %}, {% endif %} 
+                    {% else %} 
+                      <span class="text-muted">{{ l }}</span>{% if not loop.last %}, {% endif %} 
+                    {% endif %} 
+                  {% endfor %}
                 </p>
                 <p>
                   <strong>Faculty:</strong>
-                  {% for f in esner_faculties %} {% if f in common_faculties %}
-                  <span class="text-primary">{{ f }}</span>{% if not loop.last
-                  %}, {% endif %} {% else %} {{ f }}{% if not loop.last %}, {%
-                  endif %} {% endif %} {% endfor %}
+                  {% for f in esner_faculties %} 
+                    {% if f in common_faculties %}
+                      <span class="text-success fw-bold">{{ f }}</span>{% if not loop.last %}, {% endif %} 
+                    {% else %} 
+                      <span class="text-muted">{{ f }}</span>{% if not loop.last %}, {% endif %} 
+                    {% endif %} 
+                  {% endfor %}
                 </p>
                 <p>
                   <strong>Interests:</strong>
-                  {% for i in esner_interests %} {% if i in common_interests %}
-                  <span class="text-primary">{{ i }}</span>{% if not loop.last
-                  %}, {% endif %} {% else %} {{ i }}{% if not loop.last %}, {%
-                  endif %} {% endif %} {% endfor %}
+                  {% for i in esner_interests %} 
+                    {% if i in common_interests %}
+                      <span class="text-success fw-bold">{{ i }}</span>{% if not loop.last %}, {% endif %} 
+                    {% else %} 
+                      <span class="text-muted">{{ i }}</span>{% if not loop.last %}, {% endif %} 
+                    {% endif %} 
+                  {% endfor %}
                 </p>
-                <p><strong>Description:</strong> {{esner.description}}<br /></p>
-                <p><strong>Type:</strong> {{esner.type}} <br></p>
-                <p>
-                  <strong>Max Buddies:</strong>
-                  {{esner.max_number_of_buddy}}<br />
-                </p>
-                <p><strong>Number of Buddies:</strong> {{ esner.buddies|length }}</p>
-                <p><p><strong>Email:</strong> {{ esner.email }}</p>
-                <p><strong>Phone:</strong> {{esner.phone_number}}</p>
-              </p>
+                <p><strong>Description:</strong> <span class="text-muted">{{ esner.description }}</span></p>
+                <p><strong>Type:</strong> <span class="text-muted">{{ esner.type }}</span></p>
+                <p><strong>Max Buddies:</strong> <span class="text-muted">{{ esner.max_number_of_buddy }}</span></p>
+                <p><strong>Number of Buddies:</strong> <span class="text-muted">{{ esner.buddies|length }}</span></p>
+                <p><strong>Email:</strong> <span class="text-muted">{{ esner.email }}</span></p>
+                <p><strong>Phone:</strong> <span class="text-muted">{{ esner.phone_number }}</span></p>
               </div>
             </div>
-            <hr />
-            <div class="d-flex justify-content-between">
+            <hr class="my-4" />
+            <div class="d-flex justify-content-between align-items-center">
               <div>
-                <p><strong>Matching Score:</strong> {{ score }}%</p>
+                <p class="mb-0"><strong>Matching Score:</strong> <span class="badge bg-primary fs-6">{{ score }}%</span></p>
               </div>
               <div>
-                <button class="btn btn-success btn-sm confirm-match">
-                  Confirm
+                <button class="btn btn-success confirm-match">
+                  <i class="bi bi-check-circle"></i> Confirm
                 </button>
-                <button class="btn btn-danger btn-sm discharge-match">
-                  Discharge
+                <button class="btn btn-outline-danger discharge-match">
+                  <i class="bi bi-x-circle"></i> Discharge
                 </button>
               </div>
             </div>
@@ -207,6 +310,66 @@
 </div>
 
 <script>
+  // Sorting functionality
+  let sortDirection = {};
+
+  function sortTable(columnIndex) {
+    const table = document.getElementById("matchTable");
+    const tbody = table.getElementsByTagName("tbody")[0];
+    const rows = Array.from(tbody.getElementsByTagName("tr")).filter(row => row.classList.contains('clickable-row'));
+    const headers = table.getElementsByTagName("th");
+    
+    // Toggle sort direction
+    sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+    
+        // Remove sorted classes from all headers
+        Array.from(headers).forEach(header => {
+      header.classList.remove('sorted-asc', 'sorted-desc');
+    });
+    
+    // Add sorted class to current header
+    headers[columnIndex].classList.add(sortDirection[columnIndex] === 'asc' ? 'sorted-asc' : 'sorted-desc');
+    
+    // Sort rows
+    rows.sort((a, b) => {
+      const aValue = a.getElementsByTagName("td")[columnIndex].textContent.trim();
+      const bValue = b.getElementsByTagName("td")[columnIndex].textContent.trim();
+      
+      // Special handling for score column (remove % and convert to number)
+      if (columnIndex === 4) {
+        const aNum = parseFloat(aValue.replace('%', ''));
+        const bNum = parseFloat(bValue.replace('%', ''));
+        return sortDirection[columnIndex] === 'asc' ? aNum - bNum : bNum - aNum;
+      }
+      
+      // Check if values are numbers
+      const aNum = parseFloat(aValue);
+      const bNum = parseFloat(bValue);
+      
+      if (!isNaN(aNum) && !isNaN(bNum)) {
+        return sortDirection[columnIndex] === 'asc' ? aNum - bNum : bNum - aNum;
+      } else {
+        // String comparison
+        if (sortDirection[columnIndex] === 'asc') {
+          return aValue.localeCompare(bValue);
+        } else {
+          return bValue.localeCompare(aValue);
+        }
+      }
+    });
+    
+    // Rebuild table with sorted rows and their details
+    const allRows = [];
+    rows.forEach(row => {
+      allRows.push(row);
+      const buddyId = row.dataset.buddyId;
+      const esnerId = row.dataset.esnerId;
+      const detailsRow = document.getElementById(`details-${buddyId}-${esnerId}`);
+      if (detailsRow) allRows.push(detailsRow);
+    });
+    
+    allRows.forEach(row => tbody.appendChild(row));
+  }
   $(document).ready(function () {
     // Toggle details row when a main row is clicked.
     $(".clickable-row").on("click", function () {

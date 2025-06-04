@@ -102,7 +102,7 @@ function validateForm() {
         return false;
     }
 
-    if (selectedInterests.length == 0) {
+    if (selectedInterests.length < 5) {
         showModal('Validation Error','Select at least 5 interest');
         return false;
     }

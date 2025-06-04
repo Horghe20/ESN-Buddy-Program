@@ -2,105 +2,116 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="container">
-    <h2 class="text-center mb-4">Update Profile</h2>
+<div class="container mt-4">
+    <h2 class="text-center text-primary mb-4">Update Profile</h2>
     <form id="buddy-form" method="POST" onsubmit="return validateForm()">
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ g.esner.name }}">
+            <input type="text" class="form-control border-0 shadow-sm" id="name" name="name" value="{{ g.esner.name }}">
         </div>
         <div class="mb-3">
             <label for="surname" class="form-label">Surname</label>
-            <input type="text" class="form-control" id="surname" name="surname" value="{{ g.esner.surname }}">
+            <input type="text" class="form-control border-0 shadow-sm" id="surname" name="surname" value="{{ g.esner.surname }}">
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ g.esner.email }}">
+            <input type="email" class="form-control border-0 shadow-sm" id="email" name="email" value="{{ g.esner.email }}">
         </div>
         <div class="mb-3">
             <label for="type" class="form-label">ESN Member Type</label>
-            <select class="form-select" id="type" name="type">
+            <select class="form-select border-0 shadow-sm" id="type" name="type">
                 <option value="Volunteer" {% if g.esner.type=='Volunteer' %}selected{% endif %}>Volunteer</option>
                 <option value="Alumnus" {% if g.esner.type=='Alumnus' %}selected{% endif %}>Alumnus</option>
             </select>
         </div>
         <div class="mb-3">
             <label for="phone" class="form-label">Phone Number</label>
-            <input type="text" class="form-control" id="phone" name="phone" value="{{ g.esner.phone_number }}">
+            <input type="text" class="form-control border-0 shadow-sm" id="phone" name="phone" value="{{ g.esner.phone_number }}">
         </div>
         <div class="mb-3">
-            <label for="nationality" class="form-label">Nationality <small>(Select the nationality of the Erasmus you
-                    are interested in or "Not Interested")</small></label>
-            <div id="nationality-container" class="form-control item-container">
+            <label for="nationality" class="form-label">Nationality <small class="text-muted">(Select or "Not Interested")</small></label>
+            <div id="nationality-container" class="form-control border-0 shadow-sm item-container">
                 {% for nationality in data.nationalities %}
                 <div class="item" onclick="selectNationality('{{ nationality }}')">{{ nationality }}</div>
                 {% endfor %}
             </div>
-            <div id="selected-nationality" class="form-control"></div>
+            <div id="selected-nationality" class="form-control border-0 shadow-sm mt-2"></div>
         </div>
         <div class="mb-3">
-            <label for="languages" class="form-label">Languages Spoken <small>(Languages you can speak or want to
-                    practice - Choose up to 5)</small></label>
-            <div id="languages-container" class="form-control item-container">
+            <label for="languages" class="form-label">Languages Spoken <small class="text-muted">(Choose up to 5)</small></label>
+            <div id="languages-container" class="form-control border-0 shadow-sm item-container">
                 {% for language in data.languages %}
                 <div class="item" onclick="selectLanguage('{{ language }}')">{{ language }}</div>
                 {% endfor %}
             </div>
-            <div id="selected-languages" class="form-control"></div>
+            <div id="selected-languages" class="form-control border-0 shadow-sm mt-2"></div>
         </div>
         <div class="mb-3">
-            <label for="faculty" class="form-label">Faculty <small>(If you want a buddy from your Faculty, add your
-                    Faculty. Otherwise, select the Faculty you want a buddy from. - Choose up to 3)</small></label>
-            <div id="faculty-container" class="form-control item-container">
+            <label for="faculty" class="form-label">Faculty <small class="text-muted">(Choose up to 3)</small></label>
+            <div id="faculty-container" class="form-control border-0 shadow-sm item-container">
                 {% for faculty in data.faculties %}
                 <div class="item" onclick="selectFaculty('{{ faculty }}')">{{ faculty }}</div>
                 {% endfor %}
             </div>
-            <div id="selected-faculty" class="form-control"></div>
+            <div id="selected-faculty" class="form-control border-0 shadow-sm mt-2"></div>
         </div>
         <div class="mb-3">
-            <label for="interests" class="form-label">Interests <small>(Choose between 5 and 10)</small></label>
-            <div id="interests-container" class="form-control item-container">
+            <label for="interests" class="form-label">Interests <small class="text-muted">(Choose between 5 and 10)</small></label>
+            <div id="interests-container" class="form-control border-0 shadow-sm item-container">
                 {% for interest in data.interests %}
                 <div class="item" onclick="selectInterest('{{ interest }}')">{{ interest }}</div>
                 {% endfor %}
             </div>
-            <div id="selected-interests" class="form-control"></div>
+            <div id="selected-interests" class="form-control border-0 shadow-sm mt-2"></div>
         </div>
         <div class="mb-3">
-            <label for="gender" class="form-label">Gender <small>(That your Buddy should have)</small></label>
-            <select class="form-select" id="gender" name="gender">
+            <label for="gender" class="form-label">Gender <small class="text-muted">(Preferred for Buddy)</small></label>
+            <select class="form-select border-0 shadow-sm" id="gender" name="gender">
                 <option value="Male" {% if g.esner.gender=='Male' %}selected{% endif %}>Male</option>
                 <option value="Female" {% if g.esner.gender=='Female' %}selected{% endif %}>Female</option>
                 <option value="Other" {% if g.esner.gender=='Other' %}selected{% endif %}>Other</option>
-                <option value="Not Interested" {% if g.esner.gender=='Not Interested' %}selected{% endif %}>Not
-                    Interested</option>
+                <option value="Not Interested" {% if g.esner.gender=='Not Interested' %}selected{% endif %}>Not Interested</option>
             </select>
         </div>
         <div class="mb-3">
-            <label for="max_number_of_buddy">Maximum Number of Buddies</label>
-            <input type="number" id="max_number_of_buddy" name="max_number_of_buddy" class="form-control" min="1"
+            <label for="max_number_of_buddy" class="form-label">Maximum Number of Buddies</label>
+            <input type="number" id="max_number_of_buddy" name="max_number_of_buddy" class="form-control border-0 shadow-sm" min="1"
                 max="5" value="{{ g.esner.max_number_of_buddy }}">
         </div>
         <div class="mb-3">
             <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" name="description"
+            <textarea class="form-control border-0 shadow-sm" id="description" name="description"
                 rows="3">{{ g.esner.description }}</textarea>
         </div>
         <div class="mb-3">
-            <label for="password" class="form-label">Password</label> <small>(Password must be 8-30 characters long,
-                include at least one uppercase letter, one lowercase letter, one number, and one special
-                character.)</small>
-            <input type="password" class="form-control" id="password" name="password"
+            <label for="password" class="form-label">Password <small class="text-muted">(Leave blank to keep unchanged)</small></label>
+            <input type="password" class="form-control border-0 shadow-sm" id="password" name="password"
                 placeholder="Leave blank to keep unchanged" minlength="8" maxlength="30"
                 pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,30}"
                 title="Password must be 8-30 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.">
         </div>
-        <button type="submit" class="btn btn-primary w-100" id="submit-btn">Update</button>
+        <button type="submit" class="btn btn-outline-primary w-100" id="submit-btn">Update</button>
     </form>
 </div>
 
-<!-- <script src="{{ url_for('static', filename='js/esner/registration.js') }}"></script> -->
+<!-- Modal -->
+<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-sm">
+            <div class="modal-header">
+                <h5 class="modal-title" id="validationModalLabel">Validation Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="validationModalBody">
+                <!-- Validation message will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
 

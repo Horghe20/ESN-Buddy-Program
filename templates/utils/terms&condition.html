@@ -1,24 +1,74 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container my-5">
-    <h1 class="text-center">Terms, Privacy & Conditions</h1>
-    <div class="card mt-4">
-        <div class="card-body">
-            <h4>1. Terms of Use</h4>
-            <p>By using this web application, you agree to comply with the rules and guidelines set by ESN Palermo. Unauthorized use or abuse of the system is strictly prohibited.</p>
+<div class="container mt-4">
+    <h1 class="text-center text-primary mb-4">Terms, Privacy & Conditions</h1>
+    
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <div class="mb-4">
+                <h4 class="text-muted mb-3">
+                    <i class="bi bi-file-text"></i> 1. Terms of Use
+                </h4>
+                <p class="text-muted">
+                    By using this web application, you agree to comply with the rules and guidelines set by ESN Palermo. 
+                    Unauthorized use or abuse of the system is strictly prohibited.
+                </p>
+            </div>
             
-            <h4>2. Data Privacy</h4>
-            <p>We take your privacy seriously. All data collected is used exclusively by ESN Palermo for internal purposes, such as matching buddies and ESNers. <strong>Your data is never shared with third parties.</strong></p>
+            <div class="mb-4">
+                <h4 class="text-muted mb-3">
+                    <i class="bi bi-shield-lock"></i> 2. Data Privacy
+                </h4>
+                <p class="text-muted">
+                    We take your privacy seriously. All data collected is used exclusively by ESN Palermo for internal purposes, 
+                    such as matching buddies and ESNers. 
+                    <span class="text-primary fw-bold">Your data is never shared with third parties.</span>
+                </p>
+            </div>
             
-            <h4>3. Data Removal</h4>
-            <p>You have the right to request the removal of your data at any time. To do so, please contact us at <a href="mailto:support@esn.org">{{config.MAIL_USERNAME}}</a>, and we will process your request promptly.</p>
+            <div class="mb-4">
+                <h4 class="text-muted mb-3">
+                    <i class="bi bi-trash"></i> 3. Data Removal
+                </h4>
+                <p class="text-muted">
+                    You have the right to request the removal of your data at any time. To do so, please contact us at 
+                    <a href="mailto:{{config.MAIL_USERNAME}}" class="text-decoration-none text-primary">
+                        <i class="bi bi-envelope"></i> {{config.MAIL_USERNAME}}
+                    </a>, 
+                    and we will process your request promptly.
+                </p>
+            </div>
 
-            <h4>4. Security</h4>
-            <p>We implement strict security measures to protect your personal information from unauthorized access or misuse.</p>
+            <div class="mb-4">
+                <h4 class="text-muted mb-3">
+                    <i class="bi bi-lock"></i> 4. Security
+                </h4>
+                <p class="text-muted">
+                    We implement strict security measures to protect your personal information from unauthorized access or misuse.
+                </p>
+            </div>
 
-            <h4>5. Changes to These Terms</h4>
-            <p>ESN Palermo reserves the right to update these terms at any time. Changes will be posted on this page, and it is your responsibility to review them periodically.</p>
+            <div class="mb-4">
+                <h4 class="text-muted mb-3">
+                    <i class="bi bi-arrow-repeat"></i> 5. Changes to These Terms
+                </h4>
+                <p class="text-muted">
+                    ESN Palermo reserves the right to update these terms at any time. Changes will be posted on this page, 
+                    and it is your responsibility to review them periodically.
+                </p>
+            </div>
+
+            <hr class="my-4">
+            
+            <div class="text-center">
+                <p class="text-muted small">
+                    <i class="bi bi-info-circle"></i> For questions or concerns, please contact 
+                    <a href="mailto:{{config.MAIL_USERNAME}}" class="text-decoration-none text-primary">
+                        {{config.MAIL_USERNAME}}
+                    </a>
+                </p>
+            </div>
         </div>
     </div>
 </div>

@@ -5,58 +5,99 @@
   }
 
   .active-row {
-    background-color: #f0f0f0;
+    background-color: #f8f9fa;
   }
 
-  /* Optionally style clickable rows to indicate they are clickable */
   .clickable-row-esners {
     cursor: pointer;
+    transition: background-color 0.2s;
   }
-  /* Table Container to enable scrolling */
+
+  .clickable-row-esners:hover {
+    background-color: #f8f9fa;
+  }
+
+  /* Table Container */
   .table-container {
-    max-height: 70vh; /* Adjusted height to fit within screen */
+    max-height: 70vh;
     overflow-y: auto;
-    border: 1px solid #ddd;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.375rem;
   }
+
   /* Fix table header */
   thead th {
     position: sticky;
     top: 0;
-    background-color: white;
+    background-color: #f8f9fa;
     z-index: 2;
+    border: none;
+    font-weight: 500;
+    color: #6c757d;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  thead th:hover {
+    background-color: #e9ecef;
+  }
+
+  thead th.sorted-asc::after {
+    content: " ↑";
+    color: #0d6efd;
+  }
+
+  thead th.sorted-desc::after {
+    content: " ↓";
+    color: #0d6efd;
+  }
+
+  table {
+    border: none !important;
+  }
+
+  table td, table th {
+    border: none !important;
+    border-bottom: 1px solid #f8f9fa !important;
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  .bg-warning {
+    background-color: #fff3cd !important;
   }
 </style>
 
-<div class="container mt-1">
-  <h2 class="text-center mb-4">Esners</h2>
-  <div class="input-group">
-    <input
-      type="text"
-      id="search"
-      class="form-control"
-      placeholder="Search..."
-    />
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary mx-auto text-center w-100">Esners <span class="text-muted fs-6">({{ esners | length }})</span></h2>
+    <button class="btn btn-outline-primary btn-sm position-absolute end-0 me-3" data-bs-toggle="modal"
+      data-bs-target="#checkModal">
+      Check
+    </button>
+  </div>
+  <div class="input-group mb-3">
+    <input type="text" id="search" class="form-control border-0 shadow-sm" placeholder="Search..." />
   </div>
   <div class="table-container">
-    <table class="table table-sm table-bordered table-hover">
+    <table class="table table-sm table-hover" id="esnersTable">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Surname</th>
-          <th>Phone Number</th>
-          <th>Email</th>
+          <th onclick="sortTable(0)">ID</th>
+          <th onclick="sortTable(1)">Name</th>
+          <th onclick="sortTable(2)">Surname</th>
+          <th onclick="sortTable(3)">Phone Number</th>
+          <th onclick="sortTable(4)">Email</th>
         </tr>
       </thead>
       <tbody id="esners-table">
         {% for esner in esners %}
-        <!-- Added data attributes for easier update -->
-        <tr
-          class="clickable-row-esners"
-          data-href="{{ url_for('admin.esner_info', esner_id=esner.id) }}"
-          data-id="{{ esner.id }}"
-        >
-          <td>{{ esner.id }}</td>
+        <tr class="clickable-row-esners" data-href="{{ url_for('admin.esner_info', esner_id=esner.id) }}"
+          data-id="{{ esner.id }}">
+          <td class="{% if not esner.is_active %} bg-warning {% endif %}">{{ esner.id }}</td>
           <td>{{ esner.name }}</td>
           <td>{{ esner.surname }}</td>
           <td>{{ esner.phone_number }}</td>
@@ -68,7 +109,73 @@
   </div>
 </div>
 
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="checkModal" tabindex="-1" aria-labelledby="checkModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-sm">
+      <div class="modal-header">
+        <h5 class="modal-title text-primary" id="checkModalLabel">Paste Names from Excel</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted">Make sure that each surname in the first box corresponds to the first name of the same person in the second box. (From the attendance register, first copy the surnames into the first box, then the corresponding first names into the second box, maintaining the same order). You can put a single pair surname name</p>
+        <textarea class="form-control border-0 shadow-sm mb-3" id="surnameData" rows="5" placeholder="Paste SURNAME list..."></textarea>
+        <textarea class="form-control border-0 shadow-sm" id="nameData" rows="5" placeholder="Paste NAME list..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="confirmProcess">Process</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+  // Sorting functionality
+  let sortDirection = {};
+
+  function sortTable(columnIndex) {
+    const table = document.getElementById("esnersTable");
+    const tbody = table.getElementsByTagName("tbody")[0];
+    const rows = Array.from(tbody.getElementsByTagName("tr"));
+    const headers = table.getElementsByTagName("th");
+    
+    // Toggle sort direction
+    sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+    
+    // Remove sorted classes from all headers
+    Array.from(headers).forEach(header => {
+      header.classList.remove('sorted-asc', 'sorted-desc');
+    });
+    
+    // Add sorted class to current header
+    headers[columnIndex].classList.add(sortDirection[columnIndex] === 'asc' ? 'sorted-asc' : 'sorted-desc');
+    
+    // Sort rows
+    rows.sort((a, b) => {
+      const aValue = a.getElementsByTagName("td")[columnIndex].textContent.trim();
+      const bValue = b.getElementsByTagName("td")[columnIndex].textContent.trim();
+      
+      // Check if values are numbers
+      const aNum = parseFloat(aValue);
+      const bNum = parseFloat(bValue);
+      
+      if (!isNaN(aNum) && !isNaN(bNum)) {
+        return sortDirection[columnIndex] === 'asc' ? aNum - bNum : bNum - aNum;
+      } else {
+        // String comparison
+        if (sortDirection[columnIndex] === 'asc') {
+          return aValue.localeCompare(bValue);
+        } else {
+          return bValue.localeCompare(aValue);
+        }
+      }
+    });
+    
+    // Reorder rows in the table
+    rows.forEach(row => tbody.appendChild(row));
+  }
+
   $(document).ready(function () {
     $(".clickable-row-esners").click(function () {
       window.location.href = $(this).data("href");
@@ -78,13 +185,35 @@
     $("#search").on("keyup", function () {
       const searchValue = $(this).val().toLowerCase();
       $("#esners-table tr.clickable-row-esners").filter(function () {
-        // Get all the text content from this row's cells
         const rowText = $(this).text().toLowerCase();
-        // Check if the row text contains the search value
         const visible = rowText.indexOf(searchValue) > -1;
         $(this).toggle(visible);
       });
     });
+
+    $("#confirmProcess").click(function () {
+      const nameData = $("#nameData").val().trim();
+      const nameDataList = nameData.split("\n");
+      const surnameData = $("#surnameData").val().trim();
+      const surnameDataList = surnameData.split("\n");
+
+      $.ajax({
+        type: "POST",
+        url: "/admin/check_esner",
+        data: JSON.stringify({ nameList: nameDataList, surnameList: surnameDataList }),
+        contentType: "application/json",
+        success: function (response) {
+          $("#checkModal").modal("hide");
+          showModal("Info", response.message);
+        },
+        error: function (error) {
+          $("#checkModal").modal("hide");
+          const errorMsg = error.responseJSON?.error || "Something went wrong";
+          showModal("Error", errorMsg);
+        },
+      });
+    });
+
   });
 </script>
 
